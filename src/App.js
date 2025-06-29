@@ -2,13 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Calendar, CheckCircle, Plus, Download, FileText, User, Zap, Printer, Copy, Trash2, Settings, X, Menu, MousePointer, Palette, Target, HelpCircle, Stethoscope, BarChart3, Layers, Wrench, ClipboardList, RotateCcw, Activity, Clock, Radiation, ChevronLeft, ChevronRight, Edit, BookOpen } from 'lucide-react';
 
 const DentalTreatmentPlanner = () => {
-  const [teethStatus, setTeethStatus] = useState({
-    13: { status: 'consider', surfaces: ['mesial', 'labial'] },
-    34: { status: 'filling', surfaces: ['occlusal', 'distal'] },
-    36: { status: 'implant' },
-    11: { status: 'crown' },
-    47: { status: 'root_canal' }
-  });
+  const [teethStatus, setTeethStatus] = useState({});
   const [cancerType, setCancerType] = useState('');
   const [showRadiationMode, setShowRadiationMode] = useState(true);
   const [selectedTooth, setSelectedTooth] = useState(null);
