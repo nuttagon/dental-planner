@@ -28,6 +28,8 @@ const DentalTreatmentPlanner = () => {
   const [procedureNotes, setProcedureNotes] = useState('');
   const [showCalendar, setShowCalendar] = useState(false);
   const [calendarDate, setCalendarDate] = useState(new Date());
+  const [radiationDate, setRadiationDate] = useState('');
+  const [selectedTime, setSelectedTime] = useState('09:30');
 
   const imertRadiationData = {
     'ca_nasopharynx': [18, 28],
@@ -44,22 +46,45 @@ const DentalTreatmentPlanner = () => {
     'left_ca_soft_palate': [48,47,46,36,37,38],
     'ca_tongue': [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38],
     'ca_floor_mouth': [48,47,46,45,44,43,42,41,31,32,33,34,35,36,37,38],
-    'midline_ca_palate': [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28]
+    'midline_ca_palate': [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28],
+    'q1_ca_gum': [18,17,16,15,14,13,12,11,21,22],
+    'q2_ca_gum': [12,11,21,22,23,24,25,26,27,28],
+    'q3_ca_gum': [42,41,31,32,33,34,35,36,37,38],
+    'q4_ca_gum': [48,47,46,45,44,43,42,41,31,32],
+    'right_ca_buccal': [18,17,16,15,14,13,12,11,48,47,46,45,44,43,42,41],
+    'left_ca_buccal': [21,22,23,24,25,26,27,28,31,32,33,34,35,36,37,38],
+    'right_ca_retromolar': [18,17,16,15,14,48,47,46,45,44],
+    'left_ca_retromolar': [24,25,26,27,28,34,35,36,37,38],
+    'rt_neck_submand': [48,47,46,45,44],
+    'lt_neck_submand': [34,35,36,37,38]
   };
 
   const cancerTypes = [
     { value: 'ca_nasopharynx', label: 'CA Nasopharynx', thai: 'มะเร็งโพรงจมูกส่วนหลัง' },
-    { value: 'right_sinunasal_ca', label: 'Right Sinunasal CA', thai: 'มะเร็งไซนัสขวา' },
-    { value: 'left_sinunasal_ca', label: 'Left Sinunasal CA', thai: 'มะเร็งไซนัสซ้าย' },
+    { value: 'right_sinunasal_ca', label: 'Right Sinunasal CA (mouth tube)', thai: 'มะเร็งไซนัสขวา' },
+    { value: 'left_sinunasal_ca', label: 'Left Sinunasal CA (mouth tube)', thai: 'มะเร็งไซนัสซ้าย' },
     { value: 'ca_hypopharynx_larynx', label: 'CA hypopharynx / Larynx', thai: 'มะเร็งคอหอยส่วนล่าง/กล่องเสียง' },
-    { value: 'right_ca_base_tongue', label: 'Right CA base of tongue', thai: 'มะเร็งโคนลิ้นขวา' },
-    { value: 'midline_ca_base_tongue', label: 'Midline CA base of tongue', thai: 'มะเร็งโคนลิ้นกลาง' },
-    { value: 'left_ca_base_tongue', label: 'Left CA base of tongue', thai: 'มะเร็งโคนลิ้นซ้าย' },
-    { value: 'right_ca_tonsil', label: 'Right CA tonsil', thai: 'มะเร็งต่อมทอนซิลขวา' },
-    { value: 'left_ca_tonsil', label: 'Left CA tonsil', thai: 'มะเร็งต่อมทอนซิลซ้าย' },
+    { value: 'right_ca_base_tongue', label: 'Right CA base of tongue (mouth tube)', thai: 'มะเร็งโคนลิ้นขวา' },
+    { value: 'midline_ca_base_tongue', label: 'Midline CA base of tongue (mouth tube)', thai: 'มะเร็งโคนลิ้นกลาง' },
+    { value: 'left_ca_base_tongue', label: 'Left CA base of tongue (mouth tube)', thai: 'มะเร็งโคนลิ้นซ้าย' },
+    { value: 'right_ca_tonsil', label: 'Right CA tonsil (mouth tube)', thai: 'มะเร็งต่อมทอนซิลขวา' },
+    { value: 'left_ca_tonsil', label: 'Left CA tonsil (mouth tube)', thai: 'มะเร็งต่อมทอนซิลซ้าย' },
     { value: 'right_ca_soft_palate', label: 'Right CA soft palate', thai: 'มะเร็งเพดานอ่อนขวา' },
     { value: 'midline_ca_soft_palate', label: 'Midline CA soft palate', thai: 'มะเร็งเพดานอ่อนกลาง' },
-    { value: 'left_ca_soft_palate', label: 'Left CA soft palate', thai: 'มะเร็งเพดานอ่อนซ้าย' }
+    { value: 'left_ca_soft_palate', label: 'Left CA soft palate', thai: 'มะเร็งเพดานอ่อนซ้าย' },
+    { value: 'ca_tongue', label: 'CA tongue (mouth tube)', thai: 'มะเร็งลิ้น' },
+    { value: 'ca_floor_mouth', label: 'CA floor of mouth (mouth tube)', thai: 'มะเร็งพื้นปาก' },
+    { value: 'midline_ca_palate', label: 'Midline CA palate (mouth tube)', thai: 'มะเร็งเพดานกลาง' },
+    { value: 'q1_ca_gum', label: 'Q1 CA gum, alveolar ridge', thai: 'มะเร็งเหงือกและสันเหงือก Q1' },
+    { value: 'q2_ca_gum', label: 'Q2 CA gum, alveolar ridge', thai: 'มะเร็งเหงือกและสันเหงือก Q2' },
+    { value: 'q3_ca_gum', label: 'Q3 CA gum, alveolar ridge', thai: 'มะเร็งเหงือกและสันเหงือก Q3' },
+    { value: 'q4_ca_gum', label: 'Q4 CA gum, alveolar ridge', thai: 'มะเร็งเหงือกและสันเหงือก Q4' },
+    { value: 'right_ca_buccal', label: 'Right CA Buccal oral mucosa', thai: 'มะเร็งเยื่อบุช่องปากด้านแก้มขวา' },
+    { value: 'left_ca_buccal', label: 'Left CA Buccal oral mucosa', thai: 'มะเร็งเยื่อบุช่องปากด้านแก้มซ้าย' },
+    { value: 'right_ca_retromolar', label: 'Right CA retromolar', thai: 'มะเร็งเหงือกหลังฟันกรามขวา' },
+    { value: 'left_ca_retromolar', label: 'Left CA retromolar', thai: 'มะเร็งเหงือกหลังฟันกรามซ้าย' },
+    { value: 'rt_neck_submand', label: 'Rt. Neck level Ib (submand area), Node +', thai: 'ต่อมน้ำเหลืองใต้ขากรรไกรขวา' },
+    { value: 'lt_neck_submand', label: 'Lt. Neck level Ib (submand area), Node +', thai: 'ต่อมน้ำเหลืองใต้ขากรรไกรซ้าย' }
   ];
 
   const procedures = [
@@ -69,6 +94,8 @@ const DentalTreatmentPlanner = () => {
     { value: 'implant', label: 'Implant', thai: 'รากเทียม', color: 'bg-gray-100 border-gray-500 text-gray-800' },
     { value: 'surgical', label: 'Surgical Extraction', thai: 'ผ่าฟันคุด', color: 'bg-cyan-100 border-cyan-500 text-cyan-800', restrictedTeeth: [18, 28, 38, 48] },
     { value: 'extract', label: 'Extraction', thai: 'ถอน', color: 'bg-red-100 border-red-500 text-red-800' },
+    { value: 'root_planing', label: 'Root Planing', thai: 'เกลารากฟัน', color: 'bg-teal-100 border-teal-500 text-teal-800' },
+    { value: 'scaling', label: 'Dental Scaling', thai: 'ขูดหินปูน', color: 'bg-lime-100 border-lime-500 text-lime-800', isFullArch: true },
     { value: 'other', label: 'Other (Specify)', thai: 'อื่นๆ (ระบุ)', color: 'bg-gray-100 border-gray-500 text-gray-800' }
   ];
 
@@ -93,6 +120,8 @@ const DentalTreatmentPlanner = () => {
     root_canal: 'bg-pink-400 border-pink-500 text-white',
     surgical: 'bg-cyan-400 border-cyan-500 text-white',
     implant: 'bg-gray-400 border-gray-500 text-white',
+    root_planing: 'bg-teal-400 border-teal-500 text-white',
+    scaling: 'bg-lime-400 border-lime-500 text-white',
     other: 'bg-gray-400 border-gray-500 text-white'
   };
 
@@ -105,6 +134,8 @@ const DentalTreatmentPlanner = () => {
     root_canal: 'Root Canal (รักษาราก)',
     surgical: 'Surgical (ผ่าฟันคุด)',
     implant: 'Implant (รากเทียม)',
+    root_planing: 'Root Planing (เกลาราก)',
+    scaling: 'Scaling (ขูดหินปูน)',
     other: 'Other (O)'
   };
 
@@ -183,9 +214,12 @@ const DentalTreatmentPlanner = () => {
     const labelRadius = fixedSize * 0.42;
     const verticalOffset = fixedSize * 0.06;
     
-    const cornerTeeth = [18, 28, 38, 48];
-    const isCornerTooth = cornerTeeth.includes(toothNumber);
-    const extraCornerOffset = isCornerTooth ? fixedSize * 0.03 : 0;
+    // ฟันพิเศษที่ต้องขยับ
+    const specialTeeth = {
+      moveDown: [18, 28],    // ฟันบนขยับลง
+      moveUp: [38, 48]       // ฟันล่างขยับขึ้น
+    };
+    const extraVerticalOffset = fixedSize * 0.007;
     
     const upperTeeth = [18, 17, 16, 15, 14, 13, 12, 11, 21, 22, 23, 24, 25, 26, 27, 28];
     const lowerTeeth = [48, 47, 46, 45, 44, 43, 42, 41, 31, 32, 33, 34, 35, 36, 37, 38];
@@ -196,21 +230,33 @@ const DentalTreatmentPlanner = () => {
       const index = upperTeeth.indexOf(toothNumber);
       angle = Math.PI - (index * Math.PI) / (upperTeeth.length - 1);
       
+      // คำนวณ offset พิเศษ
+      let additionalOffset = 0;
+      if (specialTeeth.moveDown.includes(toothNumber)) {
+        additionalOffset = extraVerticalOffset; // ขยับลง
+      }
+      
       toothX = centerX + toothRadius * Math.cos(angle);
-      toothY = centerY - Math.abs(toothRadius * Math.sin(angle)) - verticalOffset - extraCornerOffset;
+      toothY = centerY - Math.abs(toothRadius * Math.sin(angle)) - verticalOffset + additionalOffset;
       
       labelX = centerX + labelRadius * Math.cos(angle);
-      labelY = centerY - Math.abs(labelRadius * Math.sin(angle)) - verticalOffset - extraCornerOffset;
+      labelY = centerY - Math.abs(labelRadius * Math.sin(angle)) - verticalOffset + additionalOffset;
       
     } else if (lowerTeeth.includes(toothNumber)) {
       const index = lowerTeeth.indexOf(toothNumber);
       angle = Math.PI - (index * Math.PI) / (lowerTeeth.length - 1);
       
+      // คำนวณ offset พิเศษ
+      let additionalOffset = 0;
+      if (specialTeeth.moveUp.includes(toothNumber)) {
+        additionalOffset = -extraVerticalOffset; // ขยับขึ้น
+      }
+      
       toothX = centerX + toothRadius * Math.cos(angle);
-      toothY = centerY + Math.abs(toothRadius * Math.sin(angle)) + verticalOffset + extraCornerOffset;
+      toothY = centerY + Math.abs(toothRadius * Math.sin(angle)) + verticalOffset + additionalOffset;
       
       labelX = centerX + labelRadius * Math.cos(angle);
-      labelY = centerY + Math.abs(labelRadius * Math.sin(angle)) + verticalOffset + extraCornerOffset;
+      labelY = centerY + Math.abs(labelRadius * Math.sin(angle)) + verticalOffset + additionalOffset;
     }
     
     const margin = 15;
@@ -243,11 +289,11 @@ const DentalTreatmentPlanner = () => {
     
     let nextStatus;
     if (showRadiationMode && isRadiationAffected) {
-      const radiationCycle = ['extract', 'consider', 'filling', 'crown', 'root_canal', 'surgical', 'implant'];
+      const radiationCycle = ['extract', 'consider', 'filling', 'crown', 'root_canal', 'surgical', 'implant', 'root_planing'];
       const currentIndex = radiationCycle.indexOf(current);
       nextStatus = radiationCycle[(currentIndex + 1) % radiationCycle.length];
     } else {
-      const normalCycle = ['healthy', 'consider', 'extract', 'filling', 'crown', 'root_canal', 'surgical', 'implant'];
+      const normalCycle = ['healthy', 'consider', 'extract', 'filling', 'crown', 'root_canal', 'surgical', 'implant', 'root_planing'];
       const currentIndex = normalCycle.indexOf(current);
       nextStatus = normalCycle[(currentIndex + 1) % normalCycle.length];
     }
@@ -255,8 +301,8 @@ const DentalTreatmentPlanner = () => {
     if (nextStatus === 'surgical') {
       const restrictedTeeth = [18, 28, 38, 48];
       if (!restrictedTeeth.includes(toothNumber)) {
-        const radiationCycle = ['extract', 'consider', 'filling', 'crown', 'root_canal', 'implant'];
-        const normalCycle = ['healthy', 'consider', 'extract', 'filling', 'crown', 'root_canal', 'implant'];
+        const radiationCycle = ['extract', 'consider', 'filling', 'crown', 'root_canal', 'implant', 'root_planing'];
+        const normalCycle = ['healthy', 'consider', 'extract', 'filling', 'crown', 'root_canal', 'implant', 'root_planing'];
         const cycle = showRadiationMode && isRadiationAffected ? radiationCycle : normalCycle;
         const surgicalIndex = cycle.indexOf('surgical');
         if (surgicalIndex !== -1) {
@@ -464,6 +510,8 @@ const DentalTreatmentPlanner = () => {
                status === 'surgical' ? 'S' :
                status === 'extract' ? 'X' :
                status === 'consider' ? '?' :
+               status === 'root_planing' ? 'RP' :
+               status === 'scaling' ? 'SC' :
                status === 'other' ? 'O' : ''}
             </div>
           )}
@@ -561,6 +609,8 @@ const DentalTreatmentPlanner = () => {
                      toothData.status === 'surgical' ? 'S' :
                      toothData.status === 'extract' ? 'X' :
                      toothData.status === 'consider' ? '?' :
+                     toothData.status === 'root_planing' ? 'RP' :
+                     toothData.status === 'scaling' ? 'SC' :
                      toothData.status === 'other' ? 'O' : toothNumber}
                   </span>
                 ) : (
@@ -615,6 +665,8 @@ const DentalTreatmentPlanner = () => {
                      toothData.status === 'surgical' ? 'S' :
                      toothData.status === 'extract' ? 'X' :
                      toothData.status === 'consider' ? '?' :
+                     toothData.status === 'root_planing' ? 'RP' :
+                     toothData.status === 'scaling' ? 'SC' :
                      toothData.status === 'other' ? 'O' : toothNumber}
                   </span>
                 ) : (
@@ -680,6 +732,7 @@ const DentalTreatmentPlanner = () => {
       const newAppointment = {
         id: appointments.length + 1,
         date: selectedDate,
+        time: selectedTime,
         title: `การนัดครั้งที่ ${appointments.length + 1}`,
         teeth: appointmentTeeth.map(toothNumber => {
           const toothData = teethStatus[toothNumber];
@@ -699,6 +752,7 @@ const DentalTreatmentPlanner = () => {
       setAppointments(prev => [...prev, newAppointment]);
       setAppointmentTeeth([]);
       setSelectedDate('');
+      setSelectedTime('09:30');
       setAppointmentNotes('');
     }
   };
@@ -707,10 +761,34 @@ const DentalTreatmentPlanner = () => {
     setAppointments(prev => prev.filter(apt => apt.id !== appointmentId));
   };
 
+  const updateAppointmentDateTime = (appointmentId, newDate, newTime) => {
+    setAppointments(prev => prev.map(apt => 
+      apt.id === appointmentId ? { ...apt, date: newDate, time: newTime } : apt
+    ));
+  };
+
   const updateAppointmentNotes = (appointmentId, newNotes) => {
     setAppointments(prev => prev.map(apt => 
       apt.id === appointmentId ? { ...apt, patientNotes: newNotes } : apt
     ));
+  };
+
+  const getRadiationTimeline = () => {
+    if (!radiationDate) return null;
+    
+    const radDate = new Date(radiationDate);
+    const earliest = new Date(radDate);
+    earliest.setDate(radDate.getDate() - 21);
+    const latest = new Date(radDate);
+    latest.setDate(radDate.getDate() - 14);
+    
+    return {
+      radiationDate: radDate.toLocaleDateString('th-TH'),
+      earliestStart: earliest.toLocaleDateString('th-TH'),
+      latestFinish: latest.toLocaleDateString('th-TH'),
+      earliestStartEn: earliest.toISOString().split('T')[0],
+      latestFinishEn: latest.toISOString().split('T')[0]
+    };
   };
 
   const generateTreatmentReport = () => {
@@ -901,22 +979,37 @@ const DentalTreatmentPlanner = () => {
                 </div>
                 
                 {showRadiationMode && (
-                  <div className="space-y-2">
-                    <label className="block text-sm font-medium text-orange-700">
-                      Cancer Type:
-                    </label>
-                    <select
-                      className="w-full p-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-                      value={cancerType}
-                      onChange={(e) => setCancerType(e.target.value)}
-                    >
-                      <option value="">Select cancer type...</option>
-                      {cancerTypes.map(type => 
-                        <option key={type.value} value={type.value}>
-                          {type.label} - {type.thai}
-                        </option>
-                      )}
-                    </select>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-orange-700">
+                        Cancer Type:
+                      </label>
+                      <select
+                        className="w-full p-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        value={cancerType}
+                        onChange={(e) => setCancerType(e.target.value)}
+                      >
+                        <option value="">Select cancer type...</option>
+                        {cancerTypes.map(type => 
+                          <option key={type.value} value={type.value}>
+                            {type.label} - {type.thai}
+                          </option>
+                        )}
+                      </select>
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-orange-700">
+                        วันที่ฉายรังสี (Radiation Date):
+                      </label>
+                      <input
+                        type="date"
+                        className="w-full p-2 border border-orange-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                        value={radiationDate}
+                        onChange={(e) => setRadiationDate(e.target.value)}
+                        min={new Date().toISOString().split('T')[0]}
+                      />
+                    </div>
                   </div>
                 )}
               </div>
@@ -1069,7 +1162,7 @@ const DentalTreatmentPlanner = () => {
                       )}
                       
                       {/* Status Legend */}
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
                         {[
                           { status: 'healthy', color: 'bg-white border-gray-300 text-gray-600', label: 'Healthy', abbr: '' },
                           { status: 'consider', color: 'bg-yellow-400 border-yellow-500 text-white', label: 'Consider', abbr: '(พิจารณา)' },
@@ -1078,7 +1171,9 @@ const DentalTreatmentPlanner = () => {
                           { status: 'crown', color: 'bg-purple-400 border-purple-500 text-white', label: 'Crown', abbr: '(ครอบ)' },
                           { status: 'root_canal', color: 'bg-pink-400 border-pink-500 text-white', label: 'Root Canal', abbr: '(รักษาราก)' },
                           { status: 'surgical', color: 'bg-cyan-400 border-cyan-500 text-white', label: 'Surgical', abbr: '(ผ่าฟันคุด)' },
-                          { status: 'implant', color: 'bg-gray-400 border-gray-500 text-white', label: 'Implant', abbr: '(รากเทียม)' }
+                          { status: 'implant', color: 'bg-gray-400 border-gray-500 text-white', label: 'Implant', abbr: '(รากเทียม)' },
+                          { status: 'root_planing', color: 'bg-teal-400 border-teal-500 text-white', label: 'Root Planing', abbr: '(เกลาราก)' },
+                          { status: 'scaling', color: 'bg-lime-400 border-lime-500 text-white', label: 'Scaling', abbr: '(ขูดหินปูน)' }
                         ].map((item, index) => {
                           const statusData = summary[item.status];
                           const count = statusData ? statusData.count : 0;
@@ -1122,6 +1217,36 @@ const DentalTreatmentPlanner = () => {
             </div>
 
             <div className="space-y-6">
+              {/* Radiation Timeline */}
+              {showRadiationMode && radiationDate && (() => {
+                const timeline = getRadiationTimeline();
+                return (
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                    <div className="text-lg font-semibold text-orange-800 mb-3 flex items-center">
+                      <Radiation className="w-5 h-5 mr-2" />
+                      ⏰ Timeline สำหรับการรักษา
+                    </div>
+                    <div className="bg-white p-4 rounded-lg border border-orange-300">
+                      <div className="text-sm text-orange-800 space-y-2">
+                        <div>
+                          <strong>วันที่ฉายรังสี:</strong> {timeline.radiationDate}
+                        </div>
+                        <div className="bg-orange-100 p-3 rounded border border-orange-200">
+                          <div className="text-xs text-orange-900 mb-1">
+                            <strong>ควรถอนฟันให้เสร็จก่อนฉายรังสี:</strong>
+                          </div>
+                          <div className="text-sm font-bold text-orange-900">
+                            {timeline.earliestStart} (21 วัน) - {timeline.latestFinish} (14 วัน)
+                          </div>
+                        </div>
+                        <div className="text-xs text-orange-700">
+                          • ไม่ควรนัดช้าไปกว่า: <strong>{timeline.latestFinish}</strong>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
               <div className="bg-white p-6 rounded-lg shadow-lg border-2 border-dashed border-green-300">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold text-gray-800">
@@ -1130,18 +1255,96 @@ const DentalTreatmentPlanner = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      วันที่
-                    </label>
-                    <input
-                      type="date"
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                      value={selectedDate}
-                      onChange={(e) => setSelectedDate(e.target.value)}
-                      min={new Date().toISOString().split('T')[0]}
-                      placeholder="dd/mm/yyyy"
-                    />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        วันที่
+                      </label>
+                      <div className="relative">
+                        <input
+                          type="date"
+                          className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 ${
+                            (() => {
+                              if (!radiationDate || !selectedDate) return '';
+                              const timeline = getRadiationTimeline();
+                              if (!timeline) return '';
+                              const selDate = new Date(selectedDate);
+                              const radDate = new Date(radiationDate);
+                              const diffDays = Math.ceil((radDate - selDate) / (1000 * 60 * 60 * 24));
+                              
+                              if (diffDays < 14) {
+                                return 'border-red-400 bg-red-50';
+                              } else if (diffDays >= 14 && diffDays <= 21) {
+                                return 'border-yellow-400 bg-yellow-50';
+                              } else {
+                                return 'border-green-400 bg-green-50';
+                              }
+                            })()
+                          }`}
+                          value={selectedDate}
+                          onChange={(e) => setSelectedDate(e.target.value)}
+                          min={new Date().toISOString().split('T')[0]}
+                          placeholder="dd/mm/yyyy"
+                        />
+                        {radiationDate && selectedDate && (() => {
+                          const timeline = getRadiationTimeline();
+                          if (!timeline) return null;
+                          const selDate = new Date(selectedDate);
+                          const radDate = new Date(radiationDate);
+                          const diffDays = Math.ceil((radDate - selDate) / (1000 * 60 * 60 * 24));
+                          
+                          let icon = '';
+                          if (diffDays < 14) {
+                            icon = '🔴';
+                          } else if (diffDays >= 14 && diffDays <= 21) {
+                            icon = '🟡';
+                          } else {
+                            icon = '🟢';
+                          }
+                          
+                          return (
+                            <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs">
+                              {icon}
+                            </div>
+                          );
+                        })()}
+                      </div>
+                      {radiationDate && selectedDate && (() => {
+                        const timeline = getRadiationTimeline();
+                        if (!timeline) return null;
+                        const selDate = new Date(selectedDate);
+                        const radDate = new Date(radiationDate);
+                        const diffDays = Math.ceil((radDate - selDate) / (1000 * 60 * 60 * 24));
+                        
+                        let statusText = '';
+                        if (diffDays < 14) {
+                          statusText = '🔴 ช้าเกินไป';
+                        } else if (diffDays >= 14 && diffDays <= 21) {
+                          statusText = '🟡 อยู่ในช่วง 14-21 วัน ก่อนฉายรังสี';
+                        } else {
+                          statusText = '🟢 ก่อนฉายรังสี มากกว่า 21 วัน';
+                        }
+                        
+                        return (
+                          <div className="mt-1 text-xs text-gray-600">
+                            <div>{statusText}</div>
+                            <div>ช่วงเหมาะสม: {timeline.earliestStart} - {timeline.latestFinish}</div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                    
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        เวลา
+                      </label>
+                      <input
+                        type="time"
+                        className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                        value={selectedTime}
+                        onChange={(e) => setSelectedTime(e.target.value)}
+                      />
+                    </div>
                   </div>
                   
                   <div>
@@ -1188,56 +1391,120 @@ const DentalTreatmentPlanner = () => {
                 </div>
               </div>
 
-              {appointments.map((appointment) => 
-                <div
-                  key={`appointment-${appointment.id}`}
-                  className="bg-white p-6 rounded-lg shadow-lg border border-gray-200"
-                >
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold text-gray-800">
-                      {appointment.title}
-                    </h3>
-                    <button
-                      className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded"
-                      onClick={() => deleteAppointment(appointment.id)}
-                      title="Delete appointment"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
+              {appointments.map((appointment) => {
+                const timeline = getRadiationTimeline();
+                const appointmentDate = new Date(appointment.date);
+                let statusColor = '';
+                let statusText = '';
+                let statusIcon = '';
+                
+                if (timeline) {
+                  const radDate = new Date(radiationDate);
+                  const diffDays = Math.ceil((radDate - appointmentDate) / (1000 * 60 * 60 * 24));
                   
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        วันที่
-                      </label>
-                      <div className="p-3 bg-gray-50 border border-gray-300 rounded-lg">
-                        {new Date(appointment.date).toLocaleDateString('th-TH', { 
-                          year: 'numeric', 
-                          month: 'long', 
-                          day: 'numeric' 
-                        })}
+                  if (diffDays < 14) {
+                    statusColor = 'border-red-300 bg-red-50';
+                    statusText = 'ช้าเกินไป';
+                    statusIcon = '🔴';
+                  } else if (diffDays >= 14 && diffDays <= 21) {
+                    statusColor = 'border-yellow-300 bg-yellow-50';
+                    statusText = 'อยู่ในช่วง 14-21 วัน ก่อนฉายรังสี';
+                    statusIcon = '🟡';
+                  } else {
+                    statusColor = 'border-green-300 bg-green-50';
+                    statusText = 'ก่อนฉายรังสี มากกว่า 21 วัน';
+                    statusIcon = '🟢';
+                  }
+                }
+                
+                return (
+                  <div
+                    key={`appointment-${appointment.id}`}
+                    className={`bg-white p-6 rounded-lg shadow-lg border ${statusColor || 'border-gray-200'}`}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold text-gray-800">
+                        {appointment.title}
+                      </h3>
+                      <div className="flex items-center space-x-2">
+                        {timeline && statusText && (
+                          <div className={`text-xs px-2 py-1 rounded ${
+                            statusIcon === '🔴' ? 'bg-red-200 text-red-800' : 
+                            statusIcon === '🟡' ? 'bg-yellow-200 text-yellow-800' :
+                            'bg-green-200 text-green-800'
+                          }`}>
+                            {statusIcon} {statusText}
+                          </div>
+                        )}
+                        <button
+                          className="text-red-500 hover:text-red-700 p-1 hover:bg-red-50 rounded"
+                          onClick={() => deleteAppointment(appointment.id)}
+                          title="Delete appointment"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </div>
                     </div>
                     
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Procedure
-                      </label>
-                      <textarea
-                        className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 min-h-20 resize-y"
-                        value={appointment.patientNotes || ''}
-                        onChange={(e) => updateAppointmentNotes(appointment.id, e.target.value)}
-                        placeholder="กรุณาใส่รายละเอียดการรักษา..."
-                        rows={3}
-                      />
-                      <div className="text-xs text-gray-500 mt-1">
-                        สามารถแก้ไขและเพิ่มรายละเอียดเพิ่มเติมได้
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            วันที่
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="date"
+                              className={`w-full p-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 ${statusColor}`}
+                              value={appointment.date}
+                              onChange={(e) => updateAppointmentDateTime(appointment.id, e.target.value, appointment.time)}
+                              min={new Date().toISOString().split('T')[0]}
+                            />
+                            {timeline && statusIcon && (
+                              <div className="absolute right-2 top-1/2 transform -translate-y-1/2 text-xs">
+                                {statusIcon}
+                              </div>
+                            )}
+                          </div>
+                          {timeline && (
+                            <div className="mt-1 text-xs text-gray-600">
+                              เหมาะสม: {timeline.earliestStart} - {timeline.latestFinish}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            เวลา
+                          </label>
+                          <input
+                            type="time"
+                            className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                            value={appointment.time || '09:30'}
+                            onChange={(e) => updateAppointmentDateTime(appointment.id, appointment.date, e.target.value)}
+                          />
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Procedure
+                        </label>
+                        <textarea
+                          className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 min-h-20 resize-y"
+                          value={appointment.patientNotes || ''}
+                          onChange={(e) => updateAppointmentNotes(appointment.id, e.target.value)}
+                          placeholder="กรุณาใส่รายละเอียดการรักษา..."
+                          rows={3}
+                        />
+                        <div className="text-xs text-gray-500 mt-1">
+                          สามารถแก้ไขและเพิ่มรายละเอียดเพิ่มเติมได้
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              )}
+                );
+              })}
             </div>
 
             {/* Radiation Mode Guidelines */}
@@ -1401,7 +1668,7 @@ const DentalTreatmentPlanner = () => {
                             >
                               <div className="font-medium">{appointment.title}</div>
                               <div className="text-gray-600">
-                                วันที่: {new Date(appointment.date).toLocaleDateString('th-TH')}
+                                วันที่: {new Date(appointment.date).toLocaleDateString('th-TH')} เวลา {appointment.time || '09:30'} น.
                               </div>
                               <div className="text-gray-600 whitespace-pre-line">
                                 {appointment.patientNotes}
@@ -1417,10 +1684,23 @@ const DentalTreatmentPlanner = () => {
                         <h3 className="font-semibold text-orange-800 mb-3">
                           Radiation Treatment Information
                         </h3>
-                        <div className="text-sm">
+                        <div className="text-sm space-y-2">
                           <div>โหมด: Radiation Pre-treatment Mode</div>
                           {report.cancerType && (
                             <div>ประเภทมะเร็ง: {report.cancerType}</div>
+                          )}
+                          {radiationDate && (
+                            <div className="bg-orange-100 p-3 rounded border border-orange-200 mt-2">
+                              <div><strong>วันที่ฉายรังสี:</strong> {new Date(radiationDate).toLocaleDateString('th-TH')}</div>
+                              {(() => {
+                                const timeline = getRadiationTimeline();
+                                return timeline && (
+                                  <div className="text-xs mt-1 text-orange-700">
+                                    ควรถอนฟันให้เสร็จก่อน: {timeline.earliestStart} (21 วัน) - {timeline.latestFinish} (14 วัน)
+                                  </div>
+                                );
+                              })()}
+                            </div>
                           )}
                         </div>
                       </div>
@@ -1623,10 +1903,16 @@ const DentalTreatmentPlanner = () => {
               <button
                 className="text-gray-500 hover:text-gray-700 p-1"
                 onClick={() => {
+                  // Reset tooth status to healthy when closing modal
+                  setTeethStatus(prev => ({
+                    ...prev,
+                    [selectedTooth]: { status: 'healthy', surfaces: [] }
+                  }));
                   setShowProcedureModal(false);
                   setSelectedProcedure('');
                   setSelectedSurfaces([]);
                   setProcedureNotes('');
+                  setSelectedTooth(null);
                 }}
               >
                 <X className="w-5 h-5" />
@@ -1656,6 +1942,21 @@ const DentalTreatmentPlanner = () => {
                         onClick={() => {
                           if (procedure.value === 'filling') {
                             setSelectedProcedure('filling');
+                          } else if (procedure.value === 'scaling') {
+                            // Handle scaling - select all teeth in same arch
+                            const isUpperTooth = selectedTooth >= 11 && selectedTooth <= 28;
+                            const archTeeth = isUpperTooth ? teethLayout.upper : teethLayout.lower;
+                            
+                            const newStatus = { ...teethStatus };
+                            archTeeth.forEach(tooth => {
+                              newStatus[tooth] = { status: 'scaling', surfaces: [] };
+                            });
+                            setTeethStatus(newStatus);
+                            setShowProcedureModal(false);
+                            setSelectedProcedure('');
+                            setSelectedSurfaces([]);
+                            setProcedureNotes('');
+                            setSelectedTooth(null);
                           } else {
                             setTeethStatus(prev => ({
                               ...prev,
@@ -1880,6 +2181,11 @@ const DentalTreatmentPlanner = () => {
                 <button
                   className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
                   onClick={() => {
+                    // Reset tooth status to healthy when canceling
+                    setTeethStatus(prev => ({
+                      ...prev,
+                      [selectedTooth]: { status: 'healthy', surfaces: [] }
+                    }));
                     setShowProcedureModal(false);
                     setSelectedProcedure('');
                     setSelectedSurfaces([]);
